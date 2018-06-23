@@ -31,7 +31,7 @@ for ($i=0; $i<count($list); $i++) {
 			if ($list[$i]['is_edit']) {
 				$str = str_replace('<br/>','',$str); 
 			?>
-			<div id="r_edit<?=$comment_id?>" style="display:none;">
+			<div id="edit<?=$comment_id?>" style="display:none;">
 				<!-- 코멘트 수정 -->
 				<form name="fviewcomment<?=$comment_id?>" method="post" action="./write_comment_update.php" autocomplete="off">
 					<input type="hidden" name="w"			value="cu">
@@ -52,7 +52,7 @@ for ($i=0; $i<count($list); $i++) {
 			</div>
 			<? } ?>
 			<p>
-				<em><? if ($list[$i]['is_edit']) { echo "<a href=\"javascript:comment_tog('r_edit', '{$comment_id}');\">수정</a>"; } ?></em>
+				<em><? if ($list[$i]['is_edit']) { echo "<a href=\"javascript:comment_tog('edit', '{$comment_id}');\">수정</a>"; } ?></em>
 				<em><? if ($list[$i]['is_del']) { echo "<a href=\"javascript:comment_delete('{$list[$i][del_link]}');\">삭제</a>"; } ?></em>
 				<span class="date"><? echo date('m/d H:i', strtotime($list[$i]['datetime'])) ?></span>
 			</p>
