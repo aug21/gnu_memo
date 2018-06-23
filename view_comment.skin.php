@@ -1,5 +1,5 @@
 <?
-if (!defined("_GNUBOARD_")) exit; // 개별 페이지 접근 불가 
+if (!defined("_GNUBOARD_")) exit; // 개별 페이지 접근 불가
 ?>
 
 <script>
@@ -46,7 +46,7 @@ for ($i=0; $i<count($list); $i++) {
 					<? if ($comment_min || $comment_max) { ?><script type="text/javascript"> check_byte('wr_content', 'char_count'); </script><?}?>
 
 					<div class="txt-right">
-						<button type="submit" id="btn_submit" class="ui-btn" accesskey='s'>ENTER</button>
+						<button type="submit" id="btn_submit" class="ui-btn" accesskey="s">ENTER</button>
 					</div>
 				</form>
 			</div>
@@ -59,9 +59,6 @@ for ($i=0; $i<count($list); $i++) {
 		</div>
 
 		<div class="co-name"><?=$list[$i]['name']?></div>
-
-		<input type="hidden" id="secret_comment_<?=$comment_id?>" value="<?=strstr($list[$i][wr_option],"secret")?>">
-		<textarea id="save_comment_<?=$comment_id?>" style="display:none;"><?=get_text($list[$i][content], 0)?></textarea>
 	</li>
 <? } ?>
 </ul>
@@ -89,7 +86,7 @@ for ($i=0; $i<count($list); $i++) {
 		<? if ($comment_min || $comment_max) { ?><script type="text/javascript"> check_byte('wr_content', 'char_count'); </script><?}?>
 
 		<div class="txt-right">
-			<button type="submit" id="btn_submit" class="ui-btn" accesskey='s'>ENTER</button>
+			<button type="submit" id="btn_submit" class="ui-btn" accesskey="s">ENTER</button>
 		</div>
 	</form>
 </div>

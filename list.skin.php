@@ -126,7 +126,14 @@ if($is_member) {
 										<? if ($comment_min || $comment_max) { ?><script type="text/javascript"> check_byte('wr_content', 'char_count'); </script><?}?>
 
 										<div class="txt-right">
-											<button type="submit" id="btn_submit" class="ui-btn" accesskey='s'>ENTER</button>
+										<? if ($is_secret) {
+											if ($is_admin || $is_secret==1) {
+										?>
+											<input type="checkbox" id="re_secret<?=$lists[$ii][wr_id]?>" name="wr_secret" value="secret"> <label for="re_secret<?=$lists[$ii][wr_id]?>">SECRET</label>&nbsp;&nbsp;
+										<?
+											} else echo "<input type='hidden' name='wr_secret' value='secret'>";
+										} ?>
+											<button type="submit" id="btn_submit" class="ui-btn" accesskey="s">ENTER</button>
 										</div>
 									</form>
 								</div>
