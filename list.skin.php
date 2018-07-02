@@ -1,9 +1,7 @@
 <?
 if (!defined("_GNUBOARD_")) exit; // 개별 페이지 접근 불가 
-
 if($is_admin) set_session("ss_delete_token", $token = uniqid(time()));
 add_stylesheet('<link rel="stylesheet" href="'.$board_skin_url.'/style.css">', 0);
-
 if($is_member) {
 	$comment_token = uniqid(time());
 	set_session('ss_comment_token', $comment_token);
@@ -47,12 +45,11 @@ if($is_member) {
 		for ($ii=0; $ii < count($lists); $ii++) {
 			$profile = get_member($lists[$ii][mb_id]);
 			include "$board_skin_path/inc.list_main.php";
+			
 			$is_open = false;
-
-			if(get_cookie('read_'.$lists[$ii][wr_id]) == $lists[$ii][wr_password]) { 
-				$is_open = true;
-			}
-
+			$is_author = false;
+			if(get_cookie('read_'.$lists[$ii][wr_id]) == $lists[$ii][wr_password] || $is_admin) $is_open = true;
+			if($member[mb_id] && ($member[mb_id] == $lists[$ii][mb_id])) $is_author = true;
 			$lists[$ii][content] = conv_content($lists[$ii][wr_content], 0, 'wr_content');
 			$lists[$ii][content] = search_font($stx, $lists[$ii][content]);
 	?>
@@ -65,10 +62,15 @@ if($is_member) {
 								<i>NO.<?=$lists[$ii][num];?></i>
 							<? } ?>
 								<em>
-									<?=$lists[$ii][name]?> <? if($is_admin) { ?> [ <?=$lists[$ii][wr_ip]?> ]<? } ?>
+								<? if($is_member && ($lists[$ii][mb_id] != '') && $is_admin) { ?>
+									<a href="<?=G5_BBS_URL?>/memo_form.php?me_recv_mb_id=<?=$lists[$ii][mb_id]?>" class="send_memo">
+								<? } ?>
+									<?=$lists[$ii][name]?>
+								<? if($is_member && ($lists[$ii][mb_id] != '') && $is_admin) echo "</a>"; ?>
+								<? if($is_admin) { ?> <span style="font-size:10px">[ <?=$lists[$ii][wr_ip]?> ]</span><? } ?>
 								</em>
 								<strong>
-								<? if(($member[mb_id] && ($member[mb_id] == $lists[$ii][mb_id])) || $is_admin) { ?>
+								<? if($is_author || $is_admin) { ?>
 									<a href="javascript:comment_tog('edit', '<?=$lists[$ii][wr_id]?>');">수정</a>
 									<a href="<?=$delete_href?>">삭제</a>
 								<? } else if (!$lists[$ii][mb_id]) { ?>
@@ -83,7 +85,7 @@ if($is_member) {
 								</span>
 							</p>
 							<div class="qna-content">
-							<? if(strstr($lists[$ii][wr_option], 'secret') && !$is_admin && !$is_open) { ?>
+							<? if(strstr($lists[$ii][wr_option], 'secret') && !$is_open && !$is_author ) { ?>
 								<form name="fboardlist" method="post" action="<?=$board_skin_url?>/password.php" style="margin:0">
 									<input type="hidden" name="bo_table" value="<?=$bo_table?>">
 									<input type="hidden" name="sfl"      value="<?=$sfl?>">
@@ -108,7 +110,7 @@ if($is_member) {
 							<? } ?> 
 								<div id="comment<?=$lists[$ii][wr_id]?>"><?=$str?></div>
 							<? }
-							if(($member[mb_id] && ($member[mb_id] == $lists[$ii][mb_id])) || $is_admin) {
+							if($is_author || $is_admin) {
 								$str = str_replace('<br/>','',$str); 
 							?>
 								<div id="edit<?=$lists[$ii][wr_id]?>" style="display:none;">
@@ -177,6 +179,11 @@ if($is_member) {
 </div>
 
 <script>
+$('.send_memo').on('click', function() {
+	var target = $(this).attr('href');
+	window.open(target, 'memo', "width=500, height=300");
+	return false;
+});
 //if ("<?=$sca?>") document.fcategory.sca.value = "<?=$sca?>";
 if ("<?=$stx?>") {
 	document.fsearch.sfl.value = "<?=$sfl?>";
@@ -188,7 +195,6 @@ function resize_image()
 	var target = document.getElementsByName('target_resize_image[]');
 	var image_width = parseInt('<?=$board[bo_image_width]?>');
 	var image_height = 0;
-
 	for(i=0; i<target.length; i++) { 
 		// 원래 사이즈를 저장해 놓는다
 		target[i].tmp_width  = target[i].width;
@@ -201,68 +207,53 @@ function resize_image()
 		}
 	}
 }
-
 window.onload = resize_image;
-
 <? if ($is_checkbox) { ?>
 function all_checked(sw)
 {
 	var f = document.fboardlist;
-
 	for (var i=0; i<f.length; i++) {
 		if (f.elements[i].name == "chk_wr_id[]")
 			f.elements[i].checked = sw;
 	}
 }
-
 function check_confirm(str)
 {
 	var f = document.fboardlist;
 	var chk_count = 0;
-
 	for (var i=0; i<f.length; i++) {
 		if (f.elements[i].name == "chk_wr_id[]" && f.elements[i].checked)
 			chk_count++;
 	}
-
 	if (!chk_count) {
 		alert(str + "할 게시물을 하나 이상 선택하세요.");
 		return false;
 	}
 	return true;
 }
-
 // 선택한 게시물 삭제
 function select_delete()
 {
 	var f = document.fboardlist;
-
 	str = "삭제";
 	if (!check_confirm(str))
 		return;
-
 	if (!confirm("선택한 게시물을 정말 "+str+" 하시겠습니까?\n\n한번 "+str+"한 자료는 복구할 수 없습니다"))
 		return;
-
 	f.action = "./delete_all.php";
 	f.submit();
 }
-
 // 선택한 게시물 복사 및 이동
 function select_copy(sw)
 {
 	var f = document.fboardlist;
-
 	if (sw == "copy")
 		str = "복사";
 	else
 		str = "이동";
-
 	if (!check_confirm(str))
 		return;
-
 	var sub_win = window.open("", "move", "left=50, top=50, width=500, height=550, scrollbars=1");
-
 	f.sw.value = sw;
 	f.target = "move";
 	f.action = "./move.php";
