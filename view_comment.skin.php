@@ -18,7 +18,7 @@ for ($i=0; $i<count($list); $i++) {
 		<div class="qna-comment-content theme-box">
 			<!-- 코멘트 출력 -->
 			<?
-			if (strstr($lists[$ii][wr_option], "secret") && !$is_admin && !$is_open) {
+			if (strstr($lists[$ii][wr_option], "secret") && !$is_admin && !$is_open && !$is_author) {
 				echo "* 비밀글을 작성한 당사자만 답글을 확인할 수 있습니다.";
 			} else {
 				$str = $list[$i][content];
@@ -58,7 +58,13 @@ for ($i=0; $i<count($list); $i++) {
 			</p>
 		</div>
 
-		<div class="co-name"><?=$list[$i]['name']?></div>
+		<div class="co-name">
+		<? if($is_member && ($list[$i][mb_id] != '') && $is_admin) { ?>
+			<a href="<?=G5_BBS_URL?>/memo_form.php?me_recv_mb_id=<?=$list[$i][mb_id]?>" class="send_memo"><?=$G5_BBS_URL?>
+		<? } ?>
+			<?=$list[$i]['name']?>
+		<? if($is_member && ($list[$i][mb_id] != '') && $is_admin) echo "</a>"; ?>
+		</div>
 	</li>
 <? } ?>
 </ul>
@@ -96,6 +102,7 @@ for ($i=0; $i<count($list); $i++) {
 function fviewcomment<?=$wr_id?>_submit(f) {
 	return true;
 }
+
 </script>
 <? 
 include_once("$board_skin_path/view_skin_js.php");
